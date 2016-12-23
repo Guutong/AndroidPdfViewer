@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">AndroidPdfViewer</string>
+    <string name="close">Close</string>
+    <string name="share">Share</string>
 </resources>
