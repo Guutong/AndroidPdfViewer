@@ -19,12 +19,13 @@ import xyz.guutong.androidpdfviewer.Utils.FileUtil;
 
 public class PdfViewActivity extends AppCompatActivity implements DownloadFile.Listener, OnPageChangeListener, OnLoadCompleteListener {
 
-    private PDFView pdfView;
+    private static final String EXTRA_PDF_URL = "pdfUrl";
     /**
      * Default PDF url
      */
     private String pdfUrl = "http://www.axmag.com/download/pdfurl-guide.pdf";
     private Toolbar toolbar;
+    private PDFView pdfView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +37,11 @@ public class PdfViewActivity extends AppCompatActivity implements DownloadFile.L
         setSupportActionBar(toolbar);
 
         Intent intent = getIntent();
-        String inPdfUrl = intent.getStringExtra(MainActivity.EXTRA_PDF_URL) == null ? pdfUrl : intent.getStringExtra("pdfUrl");
+        String pdfUrl = intent.getStringExtra(EXTRA_PDF_URL) == null ? this.pdfUrl : intent.getStringExtra(EXTRA_PDF_URL);
+        downloadPdf(pdfUrl);
+    }
+
+    private void downloadPdf(String inPdfUrl) {
         DownloadFile downloadFile = new DownloadFileUrlConnectionImpl(this, new Handler(), this);
         downloadFile.download(inPdfUrl, new File(this.getCacheDir(), FileUtil.extractFileNameFromURL(inPdfUrl)).getAbsolutePath());
     }
