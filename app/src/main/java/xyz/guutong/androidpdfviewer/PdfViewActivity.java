@@ -77,11 +77,11 @@ public class PdfViewActivity extends AppCompatActivity implements DownloadFile.L
 
                 builder.setItems(itemsAlert, new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
+                    public void onClick(DialogInterface dialog, int itemIndex) {
                         final int COPY_LINK = 0;
                         final String label = "URL";
 
-                        if (which == COPY_LINK) {
+                        if (itemIndex == COPY_LINK) {
                             ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
                             ClipData clip = ClipData.newPlainText(label, pdfUrl);
                             clipboard.setPrimaryClip(clip);
