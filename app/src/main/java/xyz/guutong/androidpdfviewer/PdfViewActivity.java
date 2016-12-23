@@ -5,6 +5,9 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import com.github.barteksc.pdfviewer.PDFView;
 import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener;
@@ -44,6 +47,26 @@ public class PdfViewActivity extends AppCompatActivity implements DownloadFile.L
     private void downloadPdf(String inPdfUrl) {
         DownloadFile downloadFile = new DownloadFileUrlConnectionImpl(this, new Handler(), this);
         downloadFile.download(inPdfUrl, new File(this.getCacheDir(), FileUtil.extractFileNameFromURL(inPdfUrl)).getAbsolutePath());
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_close:
+                finish();
+                break;
+            case R.id.menu_share:
+                
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
