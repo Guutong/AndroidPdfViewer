@@ -23,9 +23,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
-        if(view==mOpenPdf) {
+        if (view == mOpenPdf) {
             Intent i = new Intent(this, PdfViewActivity.class);
-            i.putExtra("pdfUrl",mPdfUrl.getText().toString());
+            i.putExtra("pdfUrl", mPdfUrl.getText().toString());
             startActivity(i);
         }
     }

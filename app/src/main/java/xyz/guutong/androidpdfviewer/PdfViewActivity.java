@@ -17,6 +17,7 @@ import xyz.guutong.androidpdfviewer.Utils.DownloadFileUrlConnectionImpl;
 import xyz.guutong.androidpdfviewer.Utils.FileUtil;
 
 public class PdfViewActivity extends AppCompatActivity implements DownloadFile.Listener ,OnPageChangeListener, OnLoadCompleteListener {
+
     private PDFView pdfView;
     private String pdfUrl = "http://www.axmag.com/download/pdfurl-guide.pdf";
 
