@@ -1,1 +1,1 @@
-include ':app', ':worldclasspdf'
+include ':sample',':pdfviewer-library'
