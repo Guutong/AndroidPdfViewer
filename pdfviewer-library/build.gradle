@@ -1,4 +1,7 @@
 apply plugin: 'com.android.library'
+apply plugin: 'maven-publish'
+apply plugin: 'maven'
+
 
 android {
     compileSdkVersion 25
@@ -18,7 +21,34 @@ android {
         }
     }
 }
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId 'xyz.guutong.androidpdfviewer' //You can either define these here or get them from project conf elsewhere
+            artifactId 'pdfviewer-library'
+            version '1.0.0'
+            artifact "$buildDir/outputs/aar/pdfviewer-library-release.aar" //aar artifact you want to publish
 
+            //generate pom nodes for dependencies
+            pom.withXml {
+                def dependenciesNode = asNode().appendNode('dependencies')
+                configurations.compile.allDependencies.each { dependency ->
+                    def dependencyNode = dependenciesNode.appendNode('dependency')
+                    dependencyNode.appendNode('groupId', dependency.group)
+                    dependencyNode.appendNode('artifactId', dependency.name)
+                    dependencyNode.appendNode('version', dependency.version)
+                }
+            }
+        }
+    }
+
+    //publish to filesystem repo
+    repositories{
+        maven {
+            url "./repo"
+        }
+    }
+}
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.github.barteksc:android-pdf-viewer:2.3.0'
