@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -63,6 +64,16 @@ public class PdfViewActivity extends AppCompatActivity implements DownloadFile.L
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         pdfView = (PDFView) findViewById(R.id.pdfView);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        /* set color colorPrimaryDark*/
+        float[] hsv = new float[3];
+        Color.colorToHSV(Color.parseColor(toolbarColor), hsv);
+        hsv[2] *= 0.8f;
+        int colorPrimaryDark = Color.HSVToColor(hsv);
+        if(Build.VERSION.SDK_INT>=21) {
+            this.getWindow().setStatusBarColor(colorPrimaryDark);
+        }
+
 
         toolbar.setBackgroundColor(Color.parseColor(toolbarColor));
         toolbar.setTitle(toolbarTitle);
