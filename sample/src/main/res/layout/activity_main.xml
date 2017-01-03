@@ -31,7 +31,6 @@
         android:id="@+id/pdfUrl"
         android:hint="url"
         style="@style/Widget.AppCompat.EditText"
-        android:singleLine="false"
         android:textAppearance="@style/TextAppearance.AppCompat"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
