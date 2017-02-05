@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 intent.putExtra(PdfViewActivity.EXTRA_PDF_URL, mPdfUrl.getText().toString());
+                intent.putExtra(PdfViewActivity.EXTRA_SHOW_CLOSE_BUTTON, true);
                 startActivity(intent);
             }
         });

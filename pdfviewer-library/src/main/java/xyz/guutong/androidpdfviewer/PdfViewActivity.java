@@ -8,19 +8,17 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.github.barteksc.pdfviewer.PDFView;
 import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener;
 import com.github.barteksc.pdfviewer.listener.OnPageChangeListener;
 import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle;
@@ -37,10 +35,15 @@ public class PdfViewActivity extends AppCompatActivity implements DownloadFile.L
     public static final String EXTRA_PDF_TITLE = "EXTRA_PDF_TITLE";
     public static final String EXTRA_SHOW_SCROLL = "EXTRA_SHOW_SCROLL";
     public static final String EXTRA_SWIPE_HORIZONTAL = "EXTRA_SWIPE_HORIZONTAL";
+    public static final String EXTRA_SHOW_SHARE_BUTTON = "EXTRA_SHOW_SHARE_BUTTON";
+    public static final String EXTRA_SHOW_CLOSE_BUTTON = "EXTRA_SHOW_CLOSE_BUTTON";
     public static final String EXTRA_TOOLBAR_COLOR = "EXTRA_TOOLBAR_COLOR";
 
+    private static final int MENU_CLOSE = Menu.FIRST;
+    private static final int MENU_SHARE = Menu.FIRST + 1;
+
     private Toolbar toolbar;
-    private PDFView pdfView;
+    private com.github.barteksc.pdfviewer.PDFView pdfView;
     private Intent intentUrl;
     private ProgressBar progressBar;
     private String pdfUrl;
@@ -48,7 +51,11 @@ public class PdfViewActivity extends AppCompatActivity implements DownloadFile.L
     private Boolean swipeHorizontal;
     private String toolbarColor = "#1191d5";
     private String toolbarTitle;
+    private Boolean showShareButton;
+    private Boolean showCloseButton;
+
     private DefaultScrollHandle scrollHandle;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,11 +65,13 @@ public class PdfViewActivity extends AppCompatActivity implements DownloadFile.L
         pdfUrl = intentUrl.getStringExtra(EXTRA_PDF_URL);
         toolbarTitle = intentUrl.getStringExtra(EXTRA_PDF_TITLE) == null ? "" : intentUrl.getStringExtra(EXTRA_PDF_TITLE);
         toolbarColor = intentUrl.getStringExtra(EXTRA_TOOLBAR_COLOR) == null ? toolbarColor : intentUrl.getStringExtra(EXTRA_TOOLBAR_COLOR);
-        showScroll = intentUrl.getBooleanExtra(EXTRA_SHOW_SCROLL,false);
-        swipeHorizontal = intentUrl.getBooleanExtra(EXTRA_SWIPE_HORIZONTAL,false);
+        showScroll = intentUrl.getBooleanExtra(EXTRA_SHOW_SCROLL, false);
+        swipeHorizontal = intentUrl.getBooleanExtra(EXTRA_SWIPE_HORIZONTAL, false);
+        showShareButton = intentUrl.getBooleanExtra(EXTRA_SHOW_SHARE_BUTTON, true);
+        showCloseButton = intentUrl.getBooleanExtra(EXTRA_SHOW_CLOSE_BUTTON, true);
 
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        pdfView = (PDFView) findViewById(R.id.pdfView);
+        pdfView = (com.github.barteksc.pdfviewer.PDFView) findViewById(R.id.pdfView);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
 
         /* set color colorPrimaryDark*/
@@ -70,15 +79,14 @@ public class PdfViewActivity extends AppCompatActivity implements DownloadFile.L
         Color.colorToHSV(Color.parseColor(toolbarColor), hsv);
         hsv[2] *= 0.8f;
         int colorPrimaryDark = Color.HSVToColor(hsv);
-        if(Build.VERSION.SDK_INT>=21) {
+        if (Build.VERSION.SDK_INT >= 21) {
             this.getWindow().setStatusBarColor(colorPrimaryDark);
         }
-
 
         toolbar.setBackgroundColor(Color.parseColor(toolbarColor));
         toolbar.setTitle(toolbarTitle);
 
-        if(showScroll){
+        if (showScroll) {
             scrollHandle = new DefaultScrollHandle(this);
         }
 
@@ -93,25 +101,32 @@ public class PdfViewActivity extends AppCompatActivity implements DownloadFile.L
         try {
             DownloadFile downloadFile = new DownloadFileUrlConnectionImpl(this, new Handler(), this);
             downloadFile.download(inPdfUrl, new File(this.getCacheDir(), FileUtil.extractFileNameFromURL(inPdfUrl)).getAbsolutePath());
-        }catch (Exception e){
+        } catch (Exception e) {
             Toast.makeText(this, "Error!", Toast.LENGTH_SHORT).show();
             finish();
         }
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu, menu);
-        return true;
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.clear();
+        if (showShareButton)
+            menu.add(0, MENU_SHARE, Menu.NONE, R.string.share)
+                    .setIcon(R.drawable.ic_share)
+                    .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        if (showCloseButton)
+            menu.add(0, 1, MENU_CLOSE, R.string.close)
+                    .setIcon(R.drawable.ic_close)
+                    .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int i = item.getItemId();
-        if (i == R.id.menu_close) {
+        if (i == MENU_CLOSE) {
             finish();
-        } else if (i == R.id.menu_share) {
+        } else if (i == MENU_SHARE) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             CharSequence[] itemsAlert = {"Copy link", "Open browser"};
 
