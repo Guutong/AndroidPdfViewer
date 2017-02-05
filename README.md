@@ -6,6 +6,8 @@ Android view for displaying PDFs
     public static final String EXTRA_PDF_URL = "EXTRA_PDF_URL";
     public static final String EXTRA_PDF_TITLE = "EXTRA_PDF_TITLE";
     public static final String EXTRA_SHOW_SCROLL = "EXTRA_SHOW_SCROLL";
+    public static final String EXTRA_SHOW_SHARE_BUTTON = "EXTRA_SHOW_SHARE_BUTTON";
+    public static final String EXTRA_SHOW_CLOSE_BUTTON = "EXTRA_SHOW_CLOSE_BUTTON";
     public static final String EXTRA_SWIPE_HORIZONTAL = "EXTRA_SWIPE_HORIZONTAL";
     public static final String EXTRA_TOOLBAR_COLOR = "EXTRA_TOOLBAR_COLOR";
 ```
