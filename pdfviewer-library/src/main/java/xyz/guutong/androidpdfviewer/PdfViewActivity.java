@@ -1,15 +1,16 @@
 package xyz.guutong.androidpdfviewer;
 
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.Context;
+import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -24,6 +25,9 @@ import com.github.barteksc.pdfviewer.listener.OnPageChangeListener;
 import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 
 import xyz.guutong.androidpdfviewer.Utils.DownloadFile;
 import xyz.guutong.androidpdfviewer.Utils.DownloadFileUrlConnectionImpl;
@@ -127,31 +131,53 @@ public class PdfViewActivity extends AppCompatActivity implements DownloadFile.L
         if (i == MENU_CLOSE) {
             finish();
         } else if (i == MENU_SHARE) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            CharSequence[] itemsAlert = {"Copy link", "Open browser"};
 
-            builder.setItems(itemsAlert, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int itemIndex) {
-                    final int COPY_LINK = 0;
-                    final String label = "URL";
-
-                    if (itemIndex == COPY_LINK) {
-                        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                        ClipData clip = ClipData.newPlainText(label, pdfUrl);
-                        clipboard.setPrimaryClip(clip);
-                        return;
-                    }
-
-                    Intent intentBrowser = new Intent(Intent.ACTION_VIEW);
-                    intentBrowser.setData(Uri.parse(pdfUrl));
-                    startActivity(intentBrowser);
-                }
-            });
-            builder.show();
-
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 200);
+            } else {
+                saveFile();
+            }
         }
         return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case 200: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    saveFile();
+                }
+                return;
+            }
+        }
+    }
+
+    private void saveFile(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        try {
+            int bytesum = 0;
+            int byteread = 0;
+            File oldfile = new File(getCacheDir(), FileUtil.extractFileNameFromURL(pdfUrl));
+
+            InputStream inStream = new FileInputStream(oldfile.getAbsoluteFile());
+            FileOutputStream fs = new FileOutputStream(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/" + FileUtil.extractFileNameFromURL(pdfUrl));
+            byte[] buffer = new byte[1444];
+            while ((byteread = inStream.read(buffer)) != -1) {
+                bytesum += byteread;
+                fs.write(buffer, 0, byteread);
+            }
+            inStream.close();
+            fs.close();
+
+            builder.setMessage("File was saved in Downloads");
+
+        } catch (Exception e) {
+            builder.setMessage("Unable to save file.");
+        }
+
+        builder.show();
     }
 
     @Override
